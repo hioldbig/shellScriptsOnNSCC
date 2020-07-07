@@ -1,2 +1,2 @@
-# shellScripts-NSCC
+# shellScriptsOnNSCC
 Shell scripts at NSCC
