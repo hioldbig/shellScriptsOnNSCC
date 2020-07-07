@@ -1,0 +1,12 @@
+cif2poscar-------convert a .cif file which produced by MS to a POSCAR file.
+ usage: ~chengyh/bin/cif2pocar.sh ms.c
+
+clrvasp----------clear you VASP directory remaining the 5 files including job.sh,POTCAR,POSCAR, KPOINTS and INCAR
+ usage: ~chengyh/bin/clrvasp
+
+jobs-------------list your jobs 
+ usage: ~chengyh/bin/jobs.sh xxxxx where xxxxx is your account name.
+
+hlg--------------get the HOMO and LUMO and HOMO-LUMO gap by E-fermi value's nearest two energies
+gaps-------------get the HOMO and LUMO and HOMO-LUMO gap by electron numbers
+Zhao says the second method is much more reliable

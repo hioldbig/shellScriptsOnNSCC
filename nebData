@@ -1,0 +1,17 @@
+# a script to make the NEB data for gnuplot
+# by yhcheng@scut.edu.cn 2016-10-24
+# $1 -> the DIR where the init state OSZICAR file stored
+# $2 -> the output file at pwd to save the neb data using for gunplot
+# $3 -> the image number,default 4
+
+if [ -z $3 ];
+then
+  nr=`echo 4+2|bc`
+else 
+  nr=`echo $3+2|bc`
+fi
+
+
+file=`find $1/00 -name OSZICAR`;
+initEn=`tail -1 $file | awk '{print $5}'`;
+e0list | awk 'NR%"'$nr'"!=1||NR==1{print $0}' | awk '{$2=$2-"'$initEn'"}{printf("%d %f\n",NR,$2)}' > $2;

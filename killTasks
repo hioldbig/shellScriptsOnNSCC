@@ -1,0 +1,28 @@
+#kill all the tasks 
+
+printf "Do You really want to kill all the tasks? \n(YES/NO):"
+while read inputs
+do
+  if [ "$inputs" = "YES" ]
+  then
+      tasks=`yhqueue`
+      num=`echo "$tasks"| wc -l`
+      num=`echo "${num}-1" | bc `
+      
+      if [ "$num" -gt 0 ]
+      then      
+         echo "$tasks" | awk 'NR>1{print $1}' | xargs yhcancel
+         echo "Your tasks have been canceled"
+      else
+         echo "No tasks at present"
+      fi
+      break
+  elif [ "$inputs" = "NO" ]
+  then
+      echo "killing canceled"
+      exit 1
+  else
+      continue
+  fi 
+
+done

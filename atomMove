@@ -1,0 +1,86 @@
+# move atom's position in poscar file
+# by chengyh 2016-10-27
+# Example: atomMove POSCAR  "2 5"  "3,7 9,11"
+# 2 and 5 are the lines of the atoms to be moved
+# 3,7 are the lines of the referred atoms to dicide the coordinates of the atom of 2
+# 9,11 are the same for atom of 5
+# the new position of the moved atoms are the center of the referred atoms 
+
+OLD_IFS="$IFS"
+toMoves=($2)
+referPoints=($3)
+count=0
+
+if ! cat $1 | grep Selective > /dev/null
+then
+  initLine=8
+else
+  initLine=9
+fi
+
+for i in ${toMoves[@]} 
+do 
+  if [ $count = 0 ] 
+  then
+    POSCAR=$1
+    dos2unix $1 2> /dev/null
+  else
+    POSCAR=${file[count]}
+  fi
+
+  toMove=$[$i+$initLine]
+   
+  points=${referPoints[$count]}
+  IFS=","
+  pointLines=($points)
+  IFS="$OLD_IFS"
+
+  x=0
+  y=0
+  z=0
+  
+  num=${#pointLines[@]}
+
+  for j in ${pointLines[@]}
+  do
+    curLine=$[$j+$initLine]
+
+    point[0]=`cat $POSCAR | awk 'NR=="'$curLine'"{print $1}'`
+    point[1]=`cat $POSCAR | awk 'NR=="'$curLine'"{print $2}'`
+    point[2]=`cat $POSCAR | awk 'NR=="'$curLine'"{print $3}'` 
+    
+    x=`echo $x+${point[0]} | bc`
+    y=`echo $y+${point[1]} | bc`
+    z=`echo $z+${point[2]} | bc`
+    
+  done
+ 
+ # echo $x
+ # echo $y
+ # echo $z
+ # echo $num
+ # echo $toMove
+
+  count=$[$count+1]
+  file[count]=temp_$count
+   
+  if [ $count = ${#toMoves[@]} ]
+  then
+    cat $POSCAR | awk -v lineNum=$initLine 'NR<=lineNum{print $0}' > ${file[count]}
+    if [ $initLine = 9 ]
+    then 
+     cat $POSCAR | awk -v lineNum=$initLine -v lineMove=$toMove 'NR==lineMove{$1="'$x'"/"'$num'"; $2="'$y'"/"'$num'"; $3="'$z'"/"'$num'"}NR>lineNum{printf("%f\t%f\t%f\t%c\t%c\t%c\n",$1,$2,$3,$4,$5,$6)}' >> ${file[count]}
+    else
+     cat $POSCAR | awk -v lineNum=$initLine -v lineMove=$toMove 'NR==lineMove{$1="'$x'"/"'$num'"; $2="'$y'"/"'$num'"; $3="'$z'"/"'$num'"}NR>lineNum{printf("%f\t%f\t%f\n",$1,$2,$3)}' >> ${file[count]}
+    fi
+  else 
+    cat $POSCAR | awk 'NR=="'$toMove'"{$1="'$x'"/"'$num'"; $2="'$y'"/"'$num'"; $3="'$z'"/"'$num'"}{print $0}' > ${file[count]}
+  fi
+
+done
+  
+cp ${file[count]}  $1       
+
+rm temp_* 2> /dev/null
+
+

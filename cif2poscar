@@ -1,0 +1,46 @@
+#!/bin/sh
+# a shell to convert a cif file from MS to a POSCAR file for VASP running. 
+# by yhcheng@scut.edu.cn 2013-3-10
+# Example: cif2poscar  DataFile.cif
+# POSCAR file will replace the existing file
+
+if [ -z $2 ]
+then
+  flag='Biso'
+  line=8
+else 
+  if [ $2 = ms ]
+  then 
+     flag='Uiso'
+     line=2
+  else
+     flag='Biso'
+     line=8
+  fi
+fi
+
+if ! cat $1 | grep $flag > /dev/null
+then
+  echo 'No data lines found!'
+  exit 3 
+fi
+
+dos2unix $1 2> /dev/null 
+
+echo -e '$POSCAR   \c' > POSCAR
+
+cat $1 | grep $flag | awk  '{printf("%s\n",$"'$line'")}' | sort | uniq | awk '{printf("%s ",$1)}' >> POSCAR
+
+echo -e "\n1" >> POSCAR
+
+cat $1 | awk '/^_cell_length_a/{printf("  %f  0  0\n",$2)}' >> POSCAR
+cat $1 | awk '/^_cell_length_b/{printf("  0  %f  0\n",$2)}' >> POSCAR
+cat $1 | awk '/^_cell_length_c/{printf("  0  0  %f\n",$2)}' >> POSCAR
+
+cat $1 | grep $flag | awk  '{printf("%s\n",$"'$line'")}' | sort | uniq | awk '{printf("%s ",$1)}' >> POSCAR
+echo -n -e "\n" >> POSCAR
+cat $1 | grep $flag | awk  '{print $"'$line'"}' | sort | uniq -c | cut -f1 | awk '{print $1}' | xargs >> POSCAR
+
+echo -e 'Selective dynamics\nDirect' >> POSCAR
+
+cat $1 | grep $flag | awk '{printf("%s\t%f\t%f\t%f\tT\tT\tT\n",$2,$3,$4,$5)}' | sort -k1,1 -k4n,4 | cut -f 2-7  >> POSCAR

@@ -1,0 +1,21 @@
+
+e0list > tmp
+
+cat tmp | awk '{print $1}' > dirs
+
+rm tmp
+
+for mydir in `ls`
+do
+   findResult=`grep $mydir dirs`
+   
+   if [ -z $findResult  ] && [ "$mydir" != "dirs" ] && [ "$mydir" != "findit" ]
+   then
+     echo $mydir
+   fi
+ 
+
+done
+
+rm dirs
+

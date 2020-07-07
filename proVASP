@@ -1,0 +1,41 @@
+# Produce the vasp running directories for given poscar files
+
+if [ -z $1 ] || [ ! -d $1 ]
+then
+  echo 'Source poscar directoy not found!'
+  exit 1
+fi
+
+if [ -z $2 ]
+then
+  echo '2nd Parameter is empty!'
+  exit 2
+fi
+
+if [ -d $2 ]
+then 
+    echo 'Directory ' $2 'existing!'
+    exit 3
+elif [ -f $2 ]
+then
+    echo 'File ' $2  'existing'
+    exit 3
+else 
+    mkdir $2
+fi
+
+for subDir in `ls $1`
+do
+   mkdir $2/${subDir}
+
+   for file in `ls $1/${subDir}`
+   do
+
+     mkdir $2/${subDir}/${file}
+     cp vasp/* $2/${subDir}/${file}/
+     cp $1/${subDir}/${file} $2/${subDir}/${file}/POSCAR
+
+   done 
+
+done
+

@@ -1,0 +1,53 @@
+# a script to list all the gap from OUTCAR files of all the subdirectories.
+# by yhcheng@scut.edu.cn 2013-3-18
+# $1 dir for using,if it is null,pwd is used
+
+if [ -z $1 ];
+then
+   files=`find -name OUTCAR`;
+else
+
+   if [ ! -d $1 ];
+   then
+     echo "Source directory is not existing!"
+     exit 4
+   fi
+
+   files=`find $1 -name OUTCAR`;
+fi
+ 
+for file in $files; 
+do
+
+ nele=`grep -a NELE $file | awk '{printf("%d",$3);}'`  
+
+ jiou=`echo "${nele}%2" | bc`;
+ homo=`echo "${nele}/2" | bc`;
+ lumo=`echo "${homo}+1" | bc`;
+
+ if [ $jiou -eq 1  ]
+ then
+    homo=$((homo+1));
+    lumo=$((homo+1));
+ fi
+ 
+ ((0))&&{  #block comment begins
+
+ two=`grep -a " $homo " $file | awk 'END{print $3}'`; 
+ one=`echo "(2-$two) > 0.001" | bc`;
+ 
+ if [ $one -eq 1 ]
+ then
+   continue
+ fi
+
+ }         #block comment ends
+
+ echo -n `dirname $file`;  
+ echo -n " `grep -a " $homo " $file | awk 'END{print $1,$2}'`"
+ #look out! inserting a blank
+ echo    " `grep -a " $lumo " $file | awk 'END{print $1,$2}'`"
+ #look out! return
+
+done | awk '{printf("%18s\t%2d\t%10f\t%2d\t%10f\t%10f\n",substr($1,3,40),$2,$3,$4,$5,$5-$3);}' | sort -k 1
+

@@ -1,0 +1,23 @@
+# compute the number of the nodes for the system to be submitted.
+
+if [ -z $1 ]
+then
+  numOfAtoms=`totalAtoms POSCAR`
+else
+  numOfAtoms=`totalAtoms $1`
+fi
+
+corePerNode=24
+
+nodes=`echo ${numOfAtoms}/${corePerNode} | bc`
+
+nodesCores=`echo ${nodes}*${corePerNode} | bc`
+
+if [ $nodesCores -lt $numOfAtoms ]
+then 
+  nodes=`echo ${nodes}+1 | bc`
+fi
+
+echo $nodes
+
+

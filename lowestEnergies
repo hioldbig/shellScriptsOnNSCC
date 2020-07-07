@@ -1,0 +1,30 @@
+E_Ag=24.259921
+
+if [ -z $1  ]
+then
+  workDir=.
+else
+  workDir=$1
+fi
+
+curDir=`pwd`
+workDir=`basename $workDir`
+
+for subDir in `ls $1`
+do
+  
+  if [ -d ${workDir}/${subDir} ]
+  then
+
+    cd ${workDir}/${subDir}
+    num=`basename $subDir`
+    e0list | awk '$2<0{print $0}' | awk '{$3=($2+"'$E_Ag'")/"'$num'"}{print $0}' | sort -k2 -r -g | awk 'END{print "'$num'",$2,$3,$1}'
+    cd $curDir
+
+  else
+
+     continue
+
+  fi
+
+done

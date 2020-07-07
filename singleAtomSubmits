@@ -1,0 +1,43 @@
+# computation for single atom energy correction 
+
+perNode=24   #Core numbers per node, need to be change for different HPC system
+
+cur_dir=`pwd`
+
+runNum=0
+
+for file in `find -name job.sh`
+ do
+   
+   path=`dirname $file`
+   
+   runNum=`echo ${runNum}+1 | bc`
+
+   cd $path
+   
+   myTask='vasp.5.2.12'
+   sed -i "s/NPAR.*$/NPAR=1/" INCAR
+
+
+   echo "#!/bin/sh" > job.sh
+   
+   echo "yhrun -N 1 -n $perNode $myTask" >> job.sh
+   echo "cp *.out old.out.1" >> job.sh
+   echo "cp OSZICAR old.OSZICAR.1" >> job.sh
+   echo "yhrun -N 1 -n $perNode $myTask" >> job.sh
+   echo "cp *.out old.out.2" >> job.sh
+   echo "cp OSZICAR old.OSZICAR.2" >> job.sh
+   echo "yhrun -N 1 -n $perNode $myTask" >> job.sh 
+
+
+   chmod a+x job.sh
+   yhbatch  -p bigdata  -N 1 job.sh
+   
+   cd $cur_dir
+
+done
+
+if [ $runNum -eq 0 ]
+then
+  echo "No task or task has been finished"
+fi

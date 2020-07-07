@@ -1,0 +1,7 @@
+#!/bin/sh
+#a shell to clear all your VASP sub-diretories of pwd.
+#be careful when using it, coz it will delete all your OUT files of VASP.
+#it will enter into all the recursive subdirectories and do the job.
+#by yhcheng@scut.edu.cn 2013-3-7
+
+find . -type f -not -name 'POSCAR*' -not -name 'POTCA*' -not -name INCAR -not -name KPOINTS -not -name 'job*' | xargs rm -rf {} \;

@@ -1,0 +1,2 @@
+yhqueue | awk '$5=="R"||NR==1{print $0}'
+

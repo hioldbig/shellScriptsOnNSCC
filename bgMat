@@ -1,0 +1,1 @@
+nohup ~/software/R2014a/bin/matlab -nojvm -nodisplay -nosplash -nodesktop < $1 1>$2 2>$3 & 

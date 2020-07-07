@@ -1,0 +1,36 @@
+# a script to list all the E0 from OSZICAR files of all the subdirectories.
+# by yhcheng@scut.edu.cn 2013-3-18
+# $2 dir for using,if it is null,pwd is used
+# $1 the referrence energy need to be subtracted
+
+if [ -z $1 ]
+then
+  subEn="-25.183391";
+else
+  subEn="$1";
+fi
+
+if [ -z $2 ];
+then
+   files=`find -name OSZICAR`;
+else
+
+   if [ ! -d $2 ];
+   then
+     echo "Source directory is not existing!"
+     exit 4
+   fi
+
+   files=`find "$2" -name OSZICAR`;
+fi
+ 
+for file in $files; 
+ do  
+
+  curDir=`dirname $file`
+  echo -n $curDir; 
+  cat ${curDir}/POSCAR | awk 'NR==7{printf(" %d ",$2)}'
+  echo `grep E0 $file | tail -1`
+done | awk '{if($7) $7=$7/1.0; else $7=-0.0; }$7<0&&$2>0{print $0}' | awk '{$7=($7-"'$subEn'")/$2}{printf("%40s\t\t%3d\t\t%5.4f\n",$1,$2,$7)}'  > tmp 
+
+cat tmp | sort -k2 -k3 -g | awk 'BEGIN{curID=0}curID!=$2{print $0; curID=$2}' > enList

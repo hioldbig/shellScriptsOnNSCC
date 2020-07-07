@@ -1,0 +1,65 @@
+#script for producing multiple neb computation directories at one time
+#By Chengyh 2016-10-24
+# $1 -> Source path dir at pwd where relaxation states are stored
+# $2 -> output neb dir at pwd under where the neb computation job will run
+# $3 -> image number for the neb computation 
+
+if [ -z $1 ];
+then
+  echo "Error! No source path given"
+  exit 1
+fi
+
+if [ -z $2 ];
+then
+  echo "Error! No output directory given"
+  exit 2
+fi
+
+if [ -z $3 ];
+then
+  echo "Error! No neb image number given"
+  exit 3
+fi
+
+
+if [ -d $2 ];
+then
+  echo "Output directory is existing!"
+  exit 4
+else
+  mkdir $2
+fi
+
+
+mydirs=`ls $1`;
+for mydir in $mydirs
+do
+   nextdir=$[$mydir+1]
+   newdir=$2/${mydir}${nextdir}
+   if [ -d $1/${nextdir} ];
+   then
+     mkdir $newdir
+     sed -i "s/IMAGES=.*$/IMAGES=`echo $3`/" nebScript/INCAR
+     cp nebScript/* ${newdir}/ -r
+     mkdir ${newdir}/00
+     mkdir ${newdir}/0$[$3+1]
+     
+     cp $1/${mydir}/OSZICAR ${newdir}/00/
+     cp $1/${mydir}/OUTCAR  ${newdir}/00/
+     cp $1/${mydir}/CONTCAR ${newdir}/00/POSCAR
+     cp $1/${nextdir}/OSZICAR ${newdir}/0$[$3+1]/
+     cp $1/${nextdir}/OUTCAR  ${newdir}/0$[$3+1]/
+     cp $1/${nextdir}/CONTCAR ${newdir}/0$[$3+1]/POSCAR     
+     
+     cd ${newdir}
+     nebmake.pl 00/POSCAR 0$[$3+1]/POSCAR $3 > /dev/null
+     cd ../../
+
+   fi    
+done
+
+echo "Neb configuation finished!"
+
+
+   

@@ -1,0 +1,60 @@
+# show the information of current running tasks including the ID and its source directory
+# $1 is a task ID you want to query,if it is given, the information of the ID will show
+
+parentDir=~/BIGDATA/chengyh/
+width=`tput cols`
+str=$(printf "%${width}s" "-")
+
+if [ -n "$1"  ]
+then
+  
+  echo -e -n "\033[5m waiting...\033[0m "
+  curFile=`find $parentDir -name "slurm-$1.out"`
+  printf "\b\b\b\b\b\b\b\b\b\b\b"
+
+  if [ -f "$curFile" ]
+  then
+    path=`dirname $curFile`
+    echo "$1 ------------------> ${path#*$parentDir}"
+  else
+    echo "No task found for $1"    
+  fi
+
+else
+
+tasks=`yhqueue`
+
+printf "\n"
+
+echo "$tasks" | awk '{print $0}END{printf("\n");}'
+
+echo "${str// /-}"
+
+printf "\n"
+
+files=`echo "$tasks" | awk 'NR>1{print $1}'`
+
+for file in $files
+do
+    echo -e -n "\033[5m waiting...\033[0m "
+    curFile=`find $parentDir -name "slurm-${file}.out"`
+    
+    printf "\b\b\b\b\b\b\b\b\b\b\b"
+    
+    if [ -f "$curFile" ]
+    then   
+    
+      path=`dirname $curFile`
+      printf "%18d -> %s\n" "${file}" "${path#*$parentDir}" 
+     
+    else
+     
+      printf "%18d -> Not Found source directory!\n" "${file}" 
+      
+    fi
+
+done 
+
+echo "$tasks" | awk 'BEGIN{running=0}NR>1&&$5=="R"{running=running+1}END{printf("\n%18d tasks in all\n",NR-1); printf("%18d tasks running\n\n",running);}'
+
+fi

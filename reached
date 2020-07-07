@@ -1,0 +1,12 @@
+# list all the dir of tasks reached the required accuracy
+
+for outFile in `find $1 -name "*.out"`
+do
+  str=`tail $outFile -n10 | grep "reached required accuracy"`
+
+  if [ ! -z "$str" ]
+  then 
+     echo `dirname $outFile`
+  fi
+
+done

@@ -1,0 +1,33 @@
+# re-run the task of the current directory
+
+outFile=`find . -name "*.out"`
+
+if [ -n "$outFile" ]
+then
+ 
+  outFile=`echo "$outFile" | xargs ls -rc | awk 'NR==1{print $1}'`
+
+  str1=`tail $outFile -n10 | grep "reached required accuracy"`
+  str2=`tail $outFile -n2`
+
+  if [ -z "$str1" ]
+    then 
+
+     rnNum=`date +%s`
+     cp $outFile ${outFile}.old.${rnNum}
+
+     [[ $str2 =~ "Call to ZHEGV failed" ]] && sed -i "s/POTIM.*$/POTIM=0.1/" INCAR
+     [[ $str2 =~ "is too small" ]] && sed -i "s/IBRION.*$/IBRION=1/" INCAR
+     [[ $str2 =~ "Routine ZPOTRF failed!" ]] && sed -i "s/POTIM.*$/POTIM=0.1/" INCAR
+     [[ $str2 =~ "to POSCAR and continue" ]] && cp CONTCAR POSCAR
+     [[ $str2 =~ "next Energy=" ]] && cp CONTCAR POSCAR
+     [[ $str2 =~ "search vector abs" ]] && cp CONTCAR POSCAR
+     [[ $str2 =~ "hermitian in DAV" ]] && sed -i "s/IBRION.*$/IBRION=1/" INCAR
+     
+     yhrun -N $1 -n $2 $3
+  fi
+
+fi
+
+
+

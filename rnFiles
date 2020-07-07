@@ -1,0 +1,8 @@
+# only a temp script for delete file, carefully use it
+
+
+for file in `find -name "*.out" | xargs ls -al | sort -k7 | awk 'NR<166{print $9}'`
+do
+  #mv $file ${file}.old
+done
+ 

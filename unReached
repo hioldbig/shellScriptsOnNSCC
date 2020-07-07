@@ -1,0 +1,49 @@
+# list all the dir of tasks that have not reached the required accuracy
+
+unReached=0
+reached=0
+runDir=`pwd`
+width=`tput cols`
+str=$(printf "%${width}s" "-")
+
+
+timeStr=`date --rfc-3339=seconds | awk '{printf("%s-%s",$1,$2)}' |awk 'BEGIN{FS="+"}{printf("%s",$1)}' | awk 'BEGIN{FS=":"}{printf("%s-%s-%s",$1,$2,$3)}'`
+file=${timeStr}.unr
+
+if [ -f "tmpError" ]
+then 
+  rm tmpError
+fi
+
+
+for outFile in `find -name "*.out"`
+do
+  str1=`tail $outFile -n10 | grep "reached required accuracy"`
+  str2=`tail $outFile -n2`
+
+  if [ -z "$str1" ]
+  then 
+     unReached=`echo ${unReached}+1 | bc `
+     curDir=`dirname $outFile`
+     
+     echo $curDir $str2 >> tmpError
+  else
+     reached=`echo ${reached}+1 | bc `  
+  fi
+
+done
+
+echo "OK	            $reached"   > $file
+echo "FAILED/unFinished   $unReached" >> $file
+
+if [ $unReached -gt 0 ]
+ then
+  echo "${str// /-}" >> $file
+  cat tmpError | sort -k2 >> $file
+  rm tmpError
+fi
+
+cat $file
+
+
+

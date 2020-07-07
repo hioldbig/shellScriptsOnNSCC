@@ -1,0 +1,11 @@
+if [ -z $1 ]
+then
+
+  echo "Please give a date string,for example 07/01/16";
+  exit 1;
+
+else
+
+yhacct -u xbyang_4 -S $1 -E now --field=jobid,partition,jobname,user,uid,nnodes,start,end,elapsed,state | grep xbyang_4 | grep FAIL | awk '{printf("%d:%s\n",$6,$9)}' | awk 'BEGIN{FS=":"}{print $1,$2,$3,$4}' | awk '{split($2,hs,"-");if(hs[2]) $2=hs[1]*24+hs[2]; else $2=hs[1]; print $1,$2,$3,$4}' | awk '{print $1*($2*3600+$3*60+$4)*24/3600}' | awk 'BEGIN{a=0;}{a=a+$1}END{print a}'
+
+fi

@@ -1,0 +1,14 @@
+#compute the npar number for the given core numbers
+#$1 is the given number of the cores
+
+r=`echo "sqrt($1)" | bc`
+
+while [ `echo $1%$r | bc` -ne 0 ]
+
+do
+
+  r=`echo ${r}-1 | bc`
+
+done
+
+echo $r  

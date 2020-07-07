@@ -1,0 +1,3 @@
+#query the used time of a job which submitted after 02/01/17 
+
+yhacct -u xbyang_4 -S 02/01/17 -E now --field=jobid,partition,jobname,user,uid,nnodes,start,end,elapsed,state | grep xbyang_4 | grep $1

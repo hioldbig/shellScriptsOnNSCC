@@ -1,0 +1,89 @@
+#to submit all the job.sh file in recursive directories of pwd
+#by yhcheng@scut.edu.cn 2013-3-10
+#$1 is the -N parameter for yhrun, if it is null, -N 5 is given
+#$2 A flag,if it is 1, then it will be re-submitted,otherwise, it will not.
+#Example: submits 2 1
+#If .out file exist in a work directory, the submit will failed. 
+#This is to avoid submit job more times for a work directory
+
+perNode=24   #Core numbers per node, need to be change for different HPC system
+
+cur_dir=`pwd`
+
+runNum=0
+
+for file in `find -name job.sh`
+ do
+   
+   path=`dirname $file`
+
+   finished=`find $path -name "*.out"`
+   if [ -n "$finished"  ]
+   then 
+      finished=`echo "$finished" | xargs ls -rc | awk 'NR==1{print $1}'`
+      continue   
+   fi   
+   
+   runNum=`echo ${runNum}+1 | bc`
+
+   cd $path
+    
+   if ! cat INCAR | grep "LCLIMB=T" > /dev/null
+   then
+     
+     if [ -z $1 ]
+     then
+       nodes=`nodes`
+     else
+       nodes=$1
+     fi
+
+     totalCores=`echo $perNode*$nodes | bc`
+
+     myTask='vasp.5.2.12'
+     npar=`npar $totalCores` 
+     sed -i "s/NPAR.*$/NPAR=`echo $npar`/" INCAR
+
+   else
+
+     if [ -z $1 ]
+     then
+       nodes=`nodes 01/POSCAR`
+     else
+       nodes=$1
+     fi
+
+     totalCores=`echo $perNode*$nodes | bc`
+  
+     myTask='vasp.5.2.12.neb'
+     images=`cat INCAR|grep "IMAGES=" | awk '{print $1}' | awk 'BEGIN{FS="="}{print $2}'`
+     npar=`echo ${totalCores}/${images} | bc`
+     npar=`npar $npar`
+     sed -i "s/NPAR.*$/NPAR=`echo $npar`/" INCAR
+
+   fi  
+
+   echo "#!/bin/sh" > job.sh
+   
+   cat >> job.sh <<EOF
+   
+yhrun -N $nodes -n $totalCores $myTask
+
+EOF
+   
+   if [ "$2" = "1" ] && [ "$myTask" = "vasp.5.2.12" ]
+   then
+     echo "reRun $nodes $totalCores  $myTask" >> job.sh
+   fi
+
+   chmod a+x job.sh
+   yhbatch -p paratera -N $nodes job.sh
+   
+   cd $cur_dir
+
+done
+
+if [ $runNum -eq 0 ]
+then
+  echo "No task or task has been finished"
+fi

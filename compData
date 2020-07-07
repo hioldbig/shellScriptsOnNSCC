@@ -1,0 +1,6 @@
+n=1;
+for file in $*
+do
+    awk -v n=$n '{print n,$0}' $file
+    n=`echo ${n}+1 | bc`
+done | sort -k2,2 -k 1n,1 | awk -v num=$# '{if(NR%num==1) { for(i=2;i<=NF;i++) printf("%8s\t",$i);} else printf("%8s\t",$NF); if(NR%num==0) printf("\n");}'

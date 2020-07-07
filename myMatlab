@@ -1,0 +1,4 @@
+#!/bin/sh
+#matlab command to submit script to run
+
+matlab -nodisplay -nosplash -nodesktop < $1

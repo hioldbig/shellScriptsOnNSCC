@@ -1,0 +1,7 @@
+# a script to make the reversedd NEB data for gnuplot
+# by yhcheng@scut.edu.cn 2016-10-24
+# $1 -> the neb dat file produced by nebData script
+# $2 -> the reversed neb dat file 
+
+initEn=`tail -1 $1 | awk '{print $2}'`;
+more $1 | awk '{print $1,$2-"'$initEn'"}' | sort -r -n | awk '{print NR,$2}' > $2;

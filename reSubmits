@@ -1,0 +1,47 @@
+# re-submit all the unreached tasks
+# If the .out file does not exist in the work directory, the job under this directory will not be submitted.
+# If you really want to re-submit the job but .out file not found,you should use submits other than this script
+
+#unReached
+
+runNum=0
+runDir=`pwd`
+
+for outFile in `find -name "*.out"`
+do
+  str1=`tail $outFile -n10 | grep "reached required accuracy"`
+  str2=`tail $outFile -n2`
+
+  if [ -z "$str1" ]
+  then 
+     runNum=`echo ${runNum}+1 | bc `
+     curDir=`dirname $outFile`
+
+     rnNum=`date +%s`
+     mv $outFile ${outFile}.old.${rnNum} #.out file could be deleted for new job
+
+     cd $curDir
+
+     [[ $str2 =~ "Call to ZHEGV failed" ]] && sed -i "s/POTIM.*$/POTIM=0.1/" INCAR
+     [[ $str2 =~ "is too small" ]] && sed -i "s/IBRION.*$/IBRION=1/" INCAR
+     [[ $str2 =~ "Routine ZPOTRF failed!" ]] && sed -i "s/POTIM.*$/POTIM=0.1/" INCAR
+     [[ $str2 =~ "POSCAR and continue" ]] && cp CONTCAR POSCAR
+     [[ $str2 =~ "next Energy=" ]] && cp CONTCAR POSCAR
+     [[ $str2 =~ "search vector abs" ]] && cp CONTCAR POSCAR
+     [[ $str2 =~ "hermitian in DAV" ]] && sed -i "s/IBRION.*$/IBRION=1/" INCAR
+     
+     cd $runDir 
+  fi
+
+done
+
+if [ $runNum -gt 0 ]
+then
+  echo "${runNum} Tasks re-submitted!"
+  submits $1
+else 
+  echo "No tasks re-submitted!"
+fi
+
+
+

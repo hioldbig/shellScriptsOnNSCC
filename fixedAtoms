@@ -1,0 +1,42 @@
+# script to fixed the atoms from $2 to $3 line in $1 file
+# by chengyh on 2016-10-29
+# Example: fixedAtoms dataFile 20 30
+# 20 is the starting line number
+# 30 is the ending line number
+
+if [ -z $1 ];
+then
+  echo "Error! No source path given"
+  exit 1
+fi
+
+if [ -z $2 ];
+then
+  echo "Error! No initial line number given"
+  exit 2
+fi
+
+if [ -z $3 ];
+then
+  echo "Error! No final line number given"
+  exit 3
+fi
+
+if [ ! -f $1 ];
+then
+  echo "Output file does not exist!"
+  exit 4
+fi
+
+cat $1 | awk -v initLine=$2 -v endLine=$3 'NR >= initLine && NR <= endLine{$4="F";$5="F";$6="F"}{print $0}' > temp
+cat temp | awk -v finaLine=$2 'NR < finaLine{print $0}' > $1
+cat temp | awk -v initLine=$2 -v endLine=$3 'NR >= initLine && NR <= endLine{printf("%f\t%f\t%f\t%c\t%c\t%c\n",$1,$2,$3,$4,$5,$6)}' >> $1
+cat temp | awk -v initLine=$3 'NR > initLine{print $0}' >> $1
+rm temp
+
+
+
+
+
+
+

@@ -1,0 +1,6 @@
+#!/bin/sh
+#for entering into the matlab command window
+
+export LD_LIBRARY_PATH=/BIGDATA/xbyang_4/chengyh/MAT/lib:$LD_LIBRARY_PATH
+export PATH=/HOME/xbyang_4/software/matlab/li/bin:$PATH
+matlab -nojvm -nodisplay -nosplash -nodesktop

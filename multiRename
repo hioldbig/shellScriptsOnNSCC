@@ -1,0 +1,4 @@
+for files in `find ./ -name "POSCAR_*"`; 
+ do 
+   mv $files  $(echo ${files}|sed 's/POSCAR_//;');  
+ done

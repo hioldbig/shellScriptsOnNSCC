@@ -1,0 +1,11 @@
+#to move CONTCAR to POSCAR in recursive directories of pwd
+#by yhcheng@scut.edu.cn 2016-9-30
+
+cur_dir=`pwd`
+
+for file in `find -name CONTCAR`
+ do
+   cd `dirname $file`
+   cp CONTCAR POSCAR
+   cd $cur_dir
+ done 
