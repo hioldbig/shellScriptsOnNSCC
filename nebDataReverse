@@ -1,5 +1,5 @@
 # a script to make the reversedd NEB data for gnuplot
-# by yhcheng@scut.edu.cn 2016-10-24
+# by cyh@308 2016-10-24
 # $1 -> the neb dat file produced by nebData script
 # $2 -> the reversed neb dat file 
 

@@ -1,5 +1,5 @@
 #to submit all the job.sh file in recursive directories of pwd
-#by yhcheng@scut.edu.cn 2013-3-10
+#by cyh@308 2013-3-10
 #$1 is the -N parameter for yhrun, if it is null, -N 5 is given
 #$2 A flag,if it is 1, then it will be re-submitted,otherwise, it will not.
 #Example: submits 2 1

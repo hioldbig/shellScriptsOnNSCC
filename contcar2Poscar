@@ -1,5 +1,5 @@
 #to move CONTCAR to POSCAR in recursive directories of pwd
-#by yhcheng@scut.edu.cn 2016-9-30
+#by cyh@308 2016-9-30
 
 cur_dir=`pwd`
 

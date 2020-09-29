@@ -1,6 +1,6 @@
 #!/bin/sh
 # a shell to convert a cif file from MS to a POSCAR file for VASP running. 
-# by yhcheng@scut.edu.cn 2013-3-10
+# by cyh@308 2013-3-10
 # Example: cif2poscar  DataFile.cif
 # POSCAR file will replace the existing file
 

@@ -1,5 +1,5 @@
 # a script to list all the E0 from OSZICAR files of all the subdirectories.
-# by yhcheng@scut.edu.cn 2013-3-18
+# by cyh@308 2013-3-18
 # $1 dir for using,if it is null,pwd is used
 
 if [ -z $1 ];

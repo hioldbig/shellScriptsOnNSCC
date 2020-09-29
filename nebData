@@ -1,5 +1,5 @@
 # a script to make the NEB data for gnuplot
-# by yhcheng@scut.edu.cn 2016-10-24
+# by cyh@308 2016-10-24
 # $1 -> the DIR where the init state OSZICAR file stored
 # $2 -> the output file at pwd to save the neb data using for gunplot
 # $3 -> the image number,default 4
